@@ -77,8 +77,8 @@ trait SparkSessionBinderBase
   with BeforeAndAfterAll
   with Eventually { self: Suite =>
 
-  protected def sparkConf: SparkConf = {
-    val conf = new SparkConf()
+  override protected def sparkConf: SparkConf = {
+    val conf = super.sparkConf
       .set("spark.hadoop.fs.file.impl", classOf[DebugFilesystem].getName)
       .set(UNSAFE_EXCEPTION_ON_MEMORY_LEAK, true)
       .set(SQLConf.CODEGEN_FALLBACK.key, "false")
