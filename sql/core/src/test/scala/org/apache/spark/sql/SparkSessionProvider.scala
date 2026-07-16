@@ -17,6 +17,8 @@
 
 package org.apache.spark.sql
 
+import org.apache.spark.SparkConf
+
 /**
  * A common trait for test suites that require a [[SparkSession]]. It abstracts over the
  * different session types supported by Spark tests: Spark classic sessions, Hive sessions
@@ -31,4 +33,29 @@ trait SparkSessionProvider {
    * Shorthand for running a query using the [[SparkSession]]
    */
   protected def sql(query: String): DataFrame = spark.sql(query)
+
+  /**
+   * Override this to configure the [[SparkConf]] of a test suite.
+   * The result of [[sparkConf]] shall be used by the [[SparkSessionBinder]] when creating the
+   * [[SparkSession]] provided as [[spark]].
+   *
+   * Example Usage:
+   * {{{
+   *   FooSuite extends ... {
+   *
+   *     // set suite-wide conf by overriding sparkConf
+   *     override protected def sparkConf: SparkConf = super.sparkConf
+   *       .set("spark.someConfThatShouldBeTrueInFooSuite", "true")
+   *       .set("spark.anotherConfThatShouldBeFalse", "false")
+   *
+   *     test("some testcase") {
+   *       // use withConf for localized conf overrides of [[RuntimeConfig]]
+   *       withConf("spark.someTestcaseSpecificConf" -> "42") {
+   *         // ...
+   *       }
+   *     }
+   *   }
+   * }}}
+   */
+  protected def sparkConf: SparkConf = new SparkConf()
 }
